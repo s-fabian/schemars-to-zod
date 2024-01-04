@@ -37,7 +37,7 @@ fn main() {
 
 ## NOTE
 
-After I made this library, I realised there is already a library with the same name.
+After I made this library, I realised there is already a library with the same functionality.
 You can find the original library [here](https://github.com/audiocloud/schemars-zod).
 This library is __not__ [the one on crates.io](https://crates.io/crates/schemars-zod).
 
