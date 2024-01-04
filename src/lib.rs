@@ -31,6 +31,8 @@
 
 #![warn(missing_docs)]
 
+use std::fmt::{Display, Formatter};
+
 use schemars::schema::Schema;
 
 mod parsers;
@@ -61,6 +63,21 @@ pub enum Error {
     #[cfg(feature = "pretty")]
     PrettifyError,
 }
+
+impl Display for Error {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Error::SchemaError(err) => write!(f, "Invalid schema: {err}"),
+            Error::Unimplemented(err) => write!(f, "Unimplemented: {err}"),
+            Error::ForgotCheck(err) => write!(f, "Forgot a check: {err}"),
+            Error::JsonError(err) => write!(f, "Serde error: {err}"),
+            #[cfg(feature = "pretty")]
+            Error::PrettifyError => write!(f, "Error when prettifying"),
+        }
+    }
+}
+
+impl std::error::Error for Error {}
 
 impl From<serde_json::Error> for Error {
     fn from(value: serde_json::Error) -> Self { Error::JsonError(value) }
