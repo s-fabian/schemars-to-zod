@@ -1,4 +1,4 @@
-//! ## schemars-zod
+//! ## schemars-to-zod
 //!
 //! A library for converting schemars's `Schema`s
 //! into zod schemas
@@ -9,7 +9,7 @@
 //! # #[allow(unused)]
 //! # fn main() {
 //! use schemars::{JsonSchema, schema_for, schema::Schema};
-//! use schemars_zod::Parser;
+//! use schemars_to_zod::Parser;
 //!
 //! #[derive(JsonSchema)]
 //! struct MyStruct {
@@ -322,7 +322,7 @@ pub(crate) struct ParserInner {
 /// # #[allow(unused)]
 /// # fn main() {
 /// use schemars::{schema::Schema, schema_for, JsonSchema};
-/// use schemars_zod::Parser;
+/// use schemars_to_zod::Parser;
 ///
 /// #[derive(JsonSchema)]
 /// struct MyStruct {
