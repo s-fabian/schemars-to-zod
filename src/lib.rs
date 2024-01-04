@@ -93,7 +93,8 @@ pub mod pretty {
             format!(".{extension}")
         };
 
-        Ok(format_text(Path::new(&path), text, config)?.ok_or(String::from("Error: could not format js"))?)
+        Ok(format_text(Path::new(&path), text, config)?
+            .ok_or(String::from("Error: could not format js"))?)
     }
 
     /// Get the default `PrettyConfig`
@@ -232,12 +233,12 @@ pub mod pretty {
             type_parameters_prefer_single_line: false,
             union_and_intersection_type_prefer_single_line: false,
             variable_statement_prefer_single_line: false,
-            binary_expression_space_surrounding_bitwise_and_arithmetic_operator: false,
-            comment_line_force_space_after_slashes: false,
+            binary_expression_space_surrounding_bitwise_and_arithmetic_operator: true,
+            comment_line_force_space_after_slashes: true,
             construct_signature_space_after_new_keyword: false,
             constructor_space_before_parentheses: true,
             constructor_type_space_after_new_keyword: true,
-            do_while_statement_space_after_while_keyword: false,
+            do_while_statement_space_after_while_keyword: true,
             export_declaration_space_surrounding_named_exports: false,
             for_statement_space_after_for_keyword: true,
             for_statement_space_after_semi_colons: true,
@@ -260,7 +261,7 @@ pub mod pretty {
             type_annotation_space_before_colon: false,
             type_assertion_space_before_expression: false,
             type_literal_space_surrounding_properties: false,
-            while_statement_space_after_while_keyword: false,
+            while_statement_space_after_while_keyword: true,
             arguments_space_around: false,
             array_expression_space_around: false,
             array_pattern_space_around: false,
@@ -279,7 +280,6 @@ pub mod pretty {
 
 /// Configuration for the parser
 #[derive(Clone, Debug, Default)]
-#[non_exhaustive]
 pub struct Config {
     /// Output `z.coerce.date()` instead of
     /// `z.date()`
@@ -369,7 +369,9 @@ impl Parser {
     pub fn parse_pretty(&self, schema: &Schema, config: &PrettyConfig) -> ParserResult {
         let parsed = self.0.parse_schema(schema)?;
 
-        format_js(&parsed, ".js", config).ok().ok_or(Error::PrettifyError)
+        format_js(&parsed, ".js", config)
+            .ok()
+            .ok_or(Error::PrettifyError)
     }
 
     /// Parse a schema and format it with the
@@ -378,7 +380,9 @@ impl Parser {
     pub fn parse_pretty_default(&self, schema: &Schema) -> ParserResult {
         let parsed = self.0.parse_schema(schema)?;
 
-        format_js(&parsed, ".js", &default_pretty_conf()).ok().ok_or(Error::PrettifyError)
+        format_js(&parsed, ".js", &default_pretty_conf())
+            .ok()
+            .ok_or(Error::PrettifyError)
     }
 }
 
