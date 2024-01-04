@@ -86,14 +86,14 @@ pub mod pretty {
         text: &str,
         extension: &str,
         config: &PrettyConfig,
-    ) -> Option<String> {
+    ) -> Result<String, Box<dyn std::error::Error>> {
         let path = if extension.contains('.') {
             extension.to_string()
         } else {
             format!(".{extension}")
         };
 
-        format_text(Path::new(&path), text, config).unwrap_or(None)
+        Ok(format_text(Path::new(&path), text, config)?.ok_or(String::from("Error: could not format js"))?)
     }
 
     /// Get the default `PrettyConfig`
@@ -369,7 +369,7 @@ impl Parser {
     pub fn parse_pretty(&self, schema: &Schema, config: &PrettyConfig) -> ParserResult {
         let parsed = self.0.parse_schema(schema)?;
 
-        format_js(&parsed, ".js", config).ok_or(Error::PrettifyError)
+        format_js(&parsed, ".js", config).ok().ok_or(Error::PrettifyError)
     }
 
     /// Parse a schema and format it with the
@@ -378,7 +378,7 @@ impl Parser {
     pub fn parse_pretty_default(&self, schema: &Schema) -> ParserResult {
         let parsed = self.0.parse_schema(schema)?;
 
-        format_js(&parsed, ".js", &default_pretty_conf()).ok_or(Error::PrettifyError)
+        format_js(&parsed, ".js", &default_pretty_conf()).ok().ok_or(Error::PrettifyError)
     }
 }
 
