@@ -15,7 +15,7 @@ impl ParserInner {
             #[cfg(test)]
             dbg!(object);
             return Err(Error::Unimplemented(
-                "Schema: a schema has to be a union, a literal or have an instance_type",
+                "Schema: a schema has to be a union, a literal or have a type",
             ));
         };
 
