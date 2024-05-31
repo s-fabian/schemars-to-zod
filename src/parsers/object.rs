@@ -82,7 +82,7 @@ impl ParserInner {
                 ));
             }
         } else {
-            object_parsed.unwrap_or_else(|| String::from("z.object()"))
+            object_parsed.unwrap_or_else(|| String::from("z.object({})"))
         };
 
         Ok(object_parsed)
