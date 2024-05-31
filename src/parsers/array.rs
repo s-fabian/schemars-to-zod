@@ -42,7 +42,11 @@ impl ParserInner {
                 },
             }
         } else {
-            String::from("z.never()")
+            if self.config.array_wrapper {
+                String::from("z.array(z.never())")
+            } else {
+                String::from("z.never().array()")
+            }
         };
 
         if !matches!(options.items, Some(SingleOrVec::Vec(_))) {
