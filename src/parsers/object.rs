@@ -39,7 +39,7 @@ impl ParserInner {
             if let Some(default) = default {
                 schema_parsed
                     .push_str(&format!(".default({})", serde_json::to_string(default)?));
-            } else if !options.required.contains(key) {
+            } else if !options.required.contains(key) && !self.config.ignore_undefined {
                 schema_parsed.push_str(".optional()");
             }
 

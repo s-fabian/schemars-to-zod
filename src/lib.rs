@@ -317,6 +317,8 @@ pub struct Config {
     /// Add `.default(123)` to schemas with a
     /// default value inside of objects
     pub add_default: bool,
+    /// Don't add `.optional()` to object properties
+    pub ignore_undefined: bool,
 }
 
 /// The inside of the parser, which contains all
