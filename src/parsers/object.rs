@@ -116,10 +116,10 @@ mod tests {
     use std::collections::HashMap;
 
     use chrono::NaiveDate;
-    use schemars::{schema::Schema, JsonSchema};
+    use schemars::{JsonSchema, schema::Schema};
     use uuid::Uuid;
 
-    use crate::{test_helpers::generator, Parser};
+    use crate::{Parser, test_helpers::generator};
 
     #[derive(JsonSchema)]
     #[allow(dead_code)]

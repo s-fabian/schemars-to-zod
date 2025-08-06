@@ -1,5 +1,3 @@
-use crate::ZOD_IMPORT;
-
 mod array;
 mod r#enum;
 mod instance_type;
@@ -13,7 +11,7 @@ mod union;
 
 #[cfg(test)]
 fn check(schema: String) {
-    let schema = format!(r#"{ZOD_IMPORT} {schema}"#);
+    let schema = format!(r#"{} {schema}"#, crate::ZOD_IMPORT);
 
     let output = std::process::Command::new("node")
         .args(["-e", &schema])

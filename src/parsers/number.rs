@@ -5,22 +5,28 @@ use crate::{ParserInner, ParserResult};
 impl ParserInner {
     /// Parse a number / integer
     pub fn parse_number(&self, is_int: bool, object: &SchemaObject) -> ParserResult {
+        let options_default = Default::default();
+        let options = object.number.as_ref().unwrap_or(&options_default);
+
         let mut res = if is_int {
-            String::from("z.int32()")
+            if options.minimum.is_some_and(|val| val == 0.) {
+                String::from("z.uint32()")
+            } else {
+                String::from("z.int32()")
+            }
         } else {
-            String::from("z.number()")
+            String::from("z.float64()")
         };
 
         let mut checks = Vec::new();
-
-        let options_default = Default::default();
-        let options = object.number.as_ref().unwrap_or(&options_default);
 
         if let Some(multiple_of) = options.multiple_of {
             checks.push(format!("z.step({multiple_of})"));
         }
 
-        if let Some(val) = options.minimum {
+        if let Some(val) = options.minimum
+            && (val != 0. || !is_int)
+        {
             checks.push(format!("z.minimum({val})"));
         }
 
@@ -46,9 +52,9 @@ impl ParserInner {
 
 #[cfg(test)]
 mod tests {
-    use schemars::{schema::Schema, JsonSchema};
+    use schemars::{JsonSchema, schema::Schema};
 
-    use crate::{test_helpers::generator, Parser};
+    use crate::{Parser, test_helpers::generator};
 
     #[derive(JsonSchema)]
     #[allow(dead_code)]

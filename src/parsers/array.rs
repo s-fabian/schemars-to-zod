@@ -60,9 +60,9 @@ impl ParserInner {
 
 #[cfg(test)]
 mod tests {
-    use schemars::{schema::Schema, JsonSchema};
+    use schemars::{JsonSchema, schema::Schema};
 
-    use crate::{test_helpers::generator, Parser};
+    use crate::{Parser, test_helpers::generator};
 
     #[derive(JsonSchema)]
     #[allow(dead_code)]

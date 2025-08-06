@@ -1,6 +1,6 @@
 z.object({
-  birthday: z.date(),
-  createdAt: z.date(),
+  birthday: z.iso.date(),
+  createdAt: z.iso.datetime({ offset: true, local: true }),
   name: z.string(),
-  userId: z.uuid(),
+  userId: z.guid(),
 });

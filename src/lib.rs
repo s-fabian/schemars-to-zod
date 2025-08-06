@@ -327,7 +327,7 @@ pub(crate) struct ParserInner {
 /// ```
 /// # #[allow(unused)]
 /// # fn main() {
-/// use schemars::{schema::Schema, schema_for, JsonSchema};
+/// use schemars::{JsonSchema, schema::Schema, schema_for};
 /// use schemars_to_zod::Parser;
 ///
 /// #[derive(JsonSchema)]
@@ -401,7 +401,7 @@ impl std::ops::Deref for Parser {
 
 #[cfg(test)]
 mod test_helpers {
-    use schemars::gen::{SchemaGenerator, SchemaSettings};
+    use schemars::r#gen::{SchemaGenerator, SchemaSettings};
 
     pub(crate) fn generator() -> SchemaGenerator {
         let mut settings = SchemaSettings::default();
