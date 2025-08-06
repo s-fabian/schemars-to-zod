@@ -1,3 +1,5 @@
+use crate::ZOD_IMPORT;
+
 mod array;
 mod r#enum;
 mod instance_type;
@@ -11,7 +13,7 @@ mod union;
 
 #[cfg(test)]
 fn check(schema: String) {
-    let schema = format!(r#"import * as z from "zod/mini"; {schema}"#);
+    let schema = format!(r#"{ZOD_IMPORT} {schema}"#);
 
     let output = std::process::Command::new("node")
         .args(["-e", &schema])

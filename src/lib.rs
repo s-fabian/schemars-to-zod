@@ -43,6 +43,9 @@ pub(crate) use dprint_plugin_typescript::configuration::Configuration as PrettyC
 #[cfg(feature = "pretty")]
 use crate::pretty::{default_pretty_conf, format_js};
 
+/// The import used for zod
+pub const ZOD_IMPORT: &str = r#"import * as z from "zod/mini";"#;
+
 #[derive(Debug)]
 /// The errors which my be returned from the
 /// `Parser::parse` functions
