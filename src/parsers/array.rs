@@ -14,14 +14,26 @@ impl ParserInner {
             ));
         }
 
-        let mut array_parsed = if let Some(items) = &options.items {
+        let array_parsed = if let Some(items) = &options.items {
             match items {
-                SingleOrVec::Single(schema) =>
-                    if self.config.array_wrapper {
-                        format!("z.array({})", self.parse_schema(&*schema)?)
-                    } else {
-                        format!("{}.array()", self.parse_schema(&*schema)?)
-                    },
+                SingleOrVec::Single(schema) => {
+                    let mut res = format!("z.array({})", self.parse_schema(&*schema)?);
+                    let mut checks = Vec::new();
+
+                    if let Some(min_items) = options.min_items {
+                        checks.push(format!("z.minLength({min_items})"));
+                    }
+
+                    if let Some(max_items) = options.max_items {
+                        checks.push(format!("z.maxLength({max_items})"));
+                    }
+
+                    if !checks.is_empty() {
+                        res.push_str(&format!(".check({})", checks.join(", ")));
+                    }
+
+                    res
+                },
                 SingleOrVec::Vec(schemas) => {
                     let mut schemas_parsed = Vec::with_capacity(schemas.len());
 
@@ -29,35 +41,18 @@ impl ParserInner {
                         schemas_parsed.push(self.parse_schema(&schema)?);
                     }
 
-                    let mut tuple_parsed =
-                        format!("z.tuple([{}])", schemas_parsed.join(", "));
-
                     if let Some(additional) = &options.additional_items {
-                        let additional_parsed = self.parse_schema(&*additional)?;
+                        let rest = self.parse_schema(&*additional)?;
 
-                        tuple_parsed.push_str(&format!(".rest({})", additional_parsed))
+                        format!("z.tuple([{}], {})", schemas_parsed.join(", "), rest)
+                    } else {
+                        format!("z.tuple([{}])", schemas_parsed.join(", "))
                     }
-
-                    tuple_parsed
                 },
             }
         } else {
-            if self.config.array_wrapper {
-                String::from("z.array(z.never())")
-            } else {
-                String::from("z.never().array()")
-            }
+            String::from("z.array(z.never())")
         };
-
-        if !matches!(options.items, Some(SingleOrVec::Vec(_))) {
-            if let Some(val) = options.min_items {
-                array_parsed.push_str(&format!(".min({})", val));
-            }
-
-            if let Some(val) = options.max_items {
-                array_parsed.push_str(&format!(".max({})", val));
-            }
-        }
 
         Ok(array_parsed)
     }
@@ -90,6 +85,7 @@ mod tests {
         // std::fs::write("tests/array.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/array.js"));
+        assert_eq!(include_str!("../../tests/array.js"), &result);
+        crate::parsers::check(result);
     }
 }

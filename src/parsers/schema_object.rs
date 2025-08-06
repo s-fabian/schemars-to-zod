@@ -19,26 +19,28 @@ impl ParserInner {
             ));
         };
 
-        let description = if self.config.add_descriptions {
-            object
-                .metadata
-                .as_ref()
-                .and_then(|m| m.description.as_ref())
-        } else {
-            None
-        };
+        // not supported anymore in zod/mini
+        // let description = if self.config.add_descriptions {
+        //     object
+        //         .metadata
+        //         .as_ref()
+        //         .and_then(|m| m.description.as_ref())
+        // } else {
+        //     None
+        // };
 
         Ok(match r#type {
             SingleOrVec::Single(instance_type) =>
-                if let Some(description) = description {
-                    format!(
-                        "{}.describe({})",
-                        self.match_instance_type(**instance_type, object)?,
-                        serde_json::to_string(&description)?
-                    )
-                } else {
-                    self.match_instance_type(**instance_type, object)?
-                },
+                self.match_instance_type(**instance_type, object)?,
+
+            // not supported anymore in zod/mini
+            // if let Some(description) = description {
+            //     format!(
+            //         "{}.describe({})",
+            //         self.match_instance_type(**instance_type, object)?,
+            //         serde_json::to_string(&description)?
+            //     )
+            // }
             SingleOrVec::Vec(instance_types) => {
                 let null_filtered: Vec<&InstanceType> = instance_types
                     .iter()
@@ -53,38 +55,41 @@ impl ParserInner {
                         unreachable!()
                     };
 
-                    if let Some(description) = description {
-                        format!(
-                            "{}.nullable().describe({})",
-                            self.match_instance_type(**instance_type, object)?,
-                            serde_json::to_string(&description)?
-                        )
-                    } else {
-                        format!(
-                            "{}.nullable()",
-                            self.match_instance_type(**instance_type, object)?
-                        )
-                    }
+                    format!(
+                        "z.nullable({})",
+                        self.match_instance_type(**instance_type, object)?
+                    )
+
+                    // not supported anymore in zod/mini
+                    // if let Some(description) = description {
+                    //     format!(
+                    //         "z.nullable({}).describe({})",
+                    //         self.match_instance_type(**instance_type,
+                    // object)?,
+                    //         serde_json::to_string(&description)?
+                    //     )
+                    // }
                 } else {
                     let mut parsed = Vec::with_capacity(null_filtered.len());
                     for instance_type in null_filtered {
                         parsed.push(self.match_instance_type(*instance_type, object)?);
                     }
 
-                    if let Some(description) = description {
-                        format!(
-                            "z.union([{}]){}.describe({})",
-                            parsed.join(", "),
-                            if is_nullable { ".nullable()" } else { "" },
-                            serde_json::to_string(description)?
-                        )
+                    if is_nullable {
+                        format!("z.nullable(z.union([{}]))", parsed.join(", "),)
                     } else {
-                        format!(
-                            "z.union([{}]){}",
-                            parsed.join(", "),
-                            if is_nullable { ".nullable()" } else { "" }
-                        )
+                        format!("z.union([{}])", parsed.join(", "),)
                     }
+
+                    // not supported anymore in zod/mini
+                    // if let Some(description) = description {
+                    //     format!(
+                    //         "z.union([{}]){}.describe({})",
+                    //         parsed.join(", "),
+                    //         if is_nullable { ".nullable()" } else { "" },
+                    //         serde_json::to_string(description)?
+                    //     )
+                    // }
                 }
             },
         })

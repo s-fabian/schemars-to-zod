@@ -9,24 +9,30 @@ impl ParserInner {
             return self.parse_enum(object);
         }
 
-        let mut res = String::from("z.string()");
-
-        if let Some(format) = object.format.as_ref().map(|s| s.as_str()) {
+        let mut res = if let Some(format) = object.format.as_ref().map(|s| s.as_str()) {
             let zod_function = match format {
-                "email" => "email",
-                "uri" => "url",
-                "uuid" => "uuid",
                 "date-time" | "partial-date-time" | "date"
                     if self.config.use_coerce_date =>
                     return Ok(String::from("z.coerce.date()")),
-                "date-time" | "partial-date-time" | "date"
-                    if !self.config.use_coerce_date =>
-                    return Ok(String::from("z.date()")),
-                _ => return Ok(res),
+
+                "email" => "z.email()",
+                "uri" => "z.url()",
+                "uuid" => "z.guid()",
+                "ipv4" => "z.ipv4()",
+                "ipv6" => "z.ipv6()",
+                "hostname" => "z.hostname()",
+                "date-time" | "partial-date-time" =>
+                    "z.iso.datetime({ offset: true, local: true })",
+                "date" => "z.iso.date()",
+                "time" => "z.iso.time()",
+                "duration" => "z.iso.duration()",
+                _ => "z.string()",
             };
 
-            res.push_str(&format!(".{}()", zod_function));
-        }
+            String::from(zod_function)
+        } else {
+            String::from("z.string()")
+        };
 
         let options_default = Default::default();
         let options = object.string.as_ref().unwrap_or(&options_default);
@@ -38,11 +44,11 @@ impl ParserInner {
             res.push_str(&format!(".length({})", options.min_length.unwrap()));
         } else {
             if let Some(val) = options.min_length {
-                res.push_str(&format!(".min({})", val));
+                res.push_str(&format!(".maxLength({})", val));
             }
 
             if let Some(val) = options.max_length {
-                res.push_str(&format!(".max({})", val));
+                res.push_str(&format!(".minLength({})", val));
             }
         }
 
@@ -86,6 +92,7 @@ mod tests {
         // std::fs::write("tests/string.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/string.js"));
+        assert_eq!(include_str!("../../tests/string.js"), &result);
+        crate::parsers::check(result);
     }
 }

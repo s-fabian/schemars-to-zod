@@ -1,4 +1,6 @@
-z.object({
-  admin: z.boolean(),
-  age: z.number().int().nullable().optional(),
-}).array();
+z.array(
+  z.object({
+    admin: z.boolean(),
+    age: z.nullish(z.int32()),
+  }),
+);

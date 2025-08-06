@@ -26,7 +26,7 @@ impl ParserInner {
                 String::from("z.string()")
             }
         } else {
-            String::from("z.string()")
+            String::from("z.never()")
         })
     }
 }
@@ -58,6 +58,7 @@ mod tests {
         // std::fs::write("tests/enum.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/enum.js"));
+        assert_eq!(include_str!("../../tests/enum.js"), &result);
+        crate::parsers::check(result);
     }
 }

@@ -105,11 +105,7 @@ impl ParserInner {
         if object.object.is_some() {
             let and = self.parse_object(object)?;
 
-            if self.config.union_first {
-                union_parsed.push_str(&format!(".and({})", and))
-            } else {
-                union_parsed = format!("{}.and({})", and, union_parsed)
-            }
+            union_parsed = format!("z.intersection({union_parsed}, {and})")
         }
 
         Ok(union_parsed)
@@ -143,7 +139,8 @@ mod tests {
         // std::fs::write("tests/tagged-union.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/tagged-union.js"));
+        assert_eq!(include_str!("../../tests/tagged-union.js"), &result);
+        crate::parsers::check(result);
     }
 
     #[derive(JsonSchema)]
@@ -165,7 +162,8 @@ mod tests {
         let parser = Parser::default();
         let result = parser.parse_pretty_default(&schema).unwrap();
 
-        assert_eq!(&result, include_str!("../../tests/double-tagged-union.js"));
+        assert_eq!(include_str!("../../tests/double-tagged-union.js"), &result);
+        crate::parsers::check(result);
         // std::fs::write("tests/
         // double-tagged-union.js",
         // result).expect("Could not save
@@ -189,7 +187,8 @@ mod tests {
         let parser = Parser::default();
         let result = parser.parse_pretty_default(&schema).unwrap();
 
-        assert_eq!(&result, include_str!("../../tests/untagged-union.js"));
+        assert_eq!(include_str!("../../tests/untagged-union.js"), &result);
+        crate::parsers::check(result);
         // std::fs::write("tests/untagged-union.
         // js", result).expect("Could not save
         // result");

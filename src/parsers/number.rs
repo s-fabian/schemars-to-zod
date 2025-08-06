@@ -6,40 +6,38 @@ impl ParserInner {
     /// Parse a number / integer
     pub fn parse_number(&self, is_int: bool, object: &SchemaObject) -> ParserResult {
         let mut res = if is_int {
-            String::from("z.number().int()")
+            String::from("z.int32()")
         } else {
             String::from("z.number()")
         };
+
+        let mut checks = Vec::new();
 
         let options_default = Default::default();
         let options = object.number.as_ref().unwrap_or(&options_default);
 
         if let Some(multiple_of) = options.multiple_of {
-            res.push_str(&format!(".multipleOf({})", multiple_of));
+            checks.push(format!("z.step({multiple_of})"));
         }
 
         if let Some(val) = options.minimum {
-            if self.config.explicit_min_max {
-                res.push_str(&format!(".gte({})", val));
-            } else {
-                res.push_str(&format!(".min({})", val));
-            }
+            checks.push(format!("z.minimum({val})"));
         }
 
         if let Some(val) = options.exclusive_minimum {
-            res.push_str(&format!(".gt({})", val));
+            checks.push(format!("z.gt({val})"));
         }
 
         if let Some(val) = options.maximum {
-            if self.config.explicit_min_max {
-                res.push_str(&format!(".lte({})", val));
-            } else {
-                res.push_str(&format!(".max({})", val));
-            }
+            checks.push(format!("z.maximum({val})"));
         }
 
         if let Some(val) = options.exclusive_maximum {
-            res.push_str(&format!(".lt({})", val));
+            checks.push(format!("z.lt({val})"));
+        }
+
+        if !checks.is_empty() {
+            res.push_str(&format!(".check({})", checks.join(", ")));
         }
 
         Ok(res)
@@ -70,6 +68,7 @@ mod tests {
         // std::fs::write("tests/number.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/number.js"));
+        assert_eq!(include_str!("../../tests/number.js"), &result);
+        crate::parsers::check(result);
     }
 }

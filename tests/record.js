@@ -1,1 +1,1 @@
-z.record(z.object({ userId: z.string().uuid() }));
+z.record(z.object({ userId: z.uuid() }));

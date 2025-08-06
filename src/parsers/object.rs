@@ -24,7 +24,7 @@ impl ParserInner {
         }
 
         for (key, schema) in &options.properties {
-            let mut schema_parsed = self.parse_schema(schema)?;
+            let schema_parsed = self.parse_schema(schema)?;
 
             let default = if let Schema::Object(schema) = schema {
                 if let Some(metadata) = &schema.metadata {
@@ -36,12 +36,28 @@ impl ParserInner {
                 None
             };
 
-            if let Some(default) = default {
-                schema_parsed
-                    .push_str(&format!(".default({})", serde_json::to_string(default)?));
+            let schema_parsed = if let Some(default) = default {
+                format!(
+                    "z.default({}, {})",
+                    schema_parsed,
+                    serde_json::to_string(default)?
+                )
             } else if !options.required.contains(key) && !self.config.ignore_undefined {
-                schema_parsed.push_str(".optional()");
-            }
+                if schema_parsed.starts_with("z.nullable(")
+                    && schema_parsed.ends_with(")")
+                {
+                    let schema_parsed = schema_parsed
+                        .strip_prefix("z.nullable(")
+                        .unwrap()
+                        .strip_suffix(")")
+                        .unwrap();
+                    format!("z.nullish({})", schema_parsed)
+                } else {
+                    format!("z.optional({})", schema_parsed)
+                }
+            } else {
+                schema_parsed
+            };
 
             properties_parsed.insert(key.to_owned(), schema_parsed);
         }
@@ -60,21 +76,27 @@ impl ParserInner {
             None
         };
 
-        let object_parsed = object_inner_parsed.map(|p| format!("z.object({{ {} }})", p));
+        let object_parsed = if options
+            .additional_properties
+            .as_ref()
+            .is_some_and(|p| p.as_ref() == &Schema::Bool(true))
+        {
+            object_inner_parsed.map(|p| format!("z.strictObject({{ {} }})", p))
+        } else {
+            object_inner_parsed.map(|p| format!("z.object({{ {} }})", p))
+        };
 
         let object_parsed = if let Some(additional) = &options.additional_properties {
             if additional.as_ref() != &Schema::Bool(false) {
                 let additional_parsed = self.parse_schema(additional)?;
 
-                if let Some(mut object_parsed) = object_parsed {
-                    object_parsed.push_str(&format!(".catchall({})", additional_parsed));
-
-                    object_parsed
+                if let Some(object_parsed) = object_parsed {
+                    format!("z.catchall({}, {})", object_parsed, additional_parsed)
                 } else {
                     format!("z.record({})", additional_parsed)
                 }
             } else if let Some(object_parsed) = object_parsed {
-                format!("{}.strict()", object_parsed)
+                object_parsed
             } else {
                 return Err(Error::Unimplemented(
                     "Object: additional_properties are false, and there are no \
@@ -82,7 +104,7 @@ impl ParserInner {
                 ));
             }
         } else {
-            object_parsed.unwrap_or_else(|| String::from("z.object({})"))
+            object_parsed.unwrap_or_else(|| String::from("z.looseObject({})"))
         };
 
         Ok(object_parsed)
@@ -119,7 +141,8 @@ mod tests {
         // std::fs::write("tests/object.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/object.js"));
+        assert_eq!(include_str!("../../tests/object.js"), &result);
+        crate::parsers::check(result);
     }
 
     type TestType = HashMap<String, TestSchema>;
@@ -135,7 +158,8 @@ mod tests {
         // std::fs::write("tests/record.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/record.js"));
+        assert_eq!(include_str!("../../tests/record.js"), &result);
+        crate::parsers::check(result);
     }
 
     #[derive(JsonSchema)]
@@ -179,6 +203,7 @@ mod tests {
         // std::fs::write("tests/flatten.js",
         // result).expect("Could not save
         // result");
-        assert_eq!(&result, include_str!("../../tests/flatten.js"));
+        assert_eq!(include_str!("../../tests/flatten.js"), &result);
+        crate::parsers::check(result);
     }
 }

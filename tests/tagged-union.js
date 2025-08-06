@@ -2,10 +2,10 @@ z.union([
   z.object({ kind: z.literal('justTheName') }),
   z.union([
     z.object({ kind: z.literal('nameAndSingleValue') }),
-    z.number().int(),
+    z.int32(),
   ]),
   z.object({
-    int: z.number().int(),
+    int: z.int32(),
     kind: z.literal('nameAndObject'),
     prop: z.string(),
   }),

@@ -2,7 +2,7 @@ z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('justTheName') }),
   z.object({
     kind: z.literal('nameAndSingleValue'),
-    value: z.number().int(),
+    value: z.int32(),
   }),
   z.object({
     kind: z.literal('nameAndTuple'),
@@ -10,9 +10,6 @@ z.discriminatedUnion('kind', [
   }),
   z.object({
     kind: z.literal('nameAndObject'),
-    value: z.object({
-      int: z.number().int(),
-      prop: z.string(),
-    }),
+    value: z.object({ int: z.int32(), prop: z.string() }),
   }),
 ]);

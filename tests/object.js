@@ -1,1 +1,1 @@
-z.object({ userId: z.string().uuid() });
+z.object({ userId: z.uuid() });

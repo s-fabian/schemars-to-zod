@@ -301,22 +301,6 @@ pub struct Config {
     /// Output `z.coerce.date()` instead of
     /// `z.date()`
     pub use_coerce_date: bool,
-    /// Output `z.array(z.any())` instead of
-    /// `z.any().array()`
-    pub array_wrapper: bool,
-    /// Output `z.number().gte(10)` instead of
-    /// `z.number().min(10)`
-    pub explicit_min_max: bool,
-    /// Add `.describe("description")` to schemas
-    /// with a description
-    pub add_descriptions: bool,
-    /// Output `z.union([]).and(z.object({}))`
-    /// instead of
-    /// `z.object({}).and(z.union([]))`
-    pub union_first: bool,
-    /// Add `.default(123)` to schemas with a
-    /// default value inside of objects
-    pub add_default: bool,
     /// Don't add `.optional()` to object properties
     pub ignore_undefined: bool,
 }
