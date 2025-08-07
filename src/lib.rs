@@ -298,12 +298,23 @@ pub mod pretty {
     }
 }
 
+/// How a date should be outputted
+#[derive(Clone, Copy, Debug, Default)]
+pub enum DateFormat {
+    /// z.date()
+    JsDate,
+    /// z.coerce.date()
+    #[default]
+    CoerceDate,
+    /// z.iso.datetime()
+    IsoStringDate,
+}
+
 /// Configuration for the parser
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Copy, Debug, Default)]
 pub struct Config {
-    /// Output `z.coerce.date()` instead of
-    /// `z.date()`
-    pub use_coerce_date: bool,
+    /// How a date should be outputted
+    pub date_format: DateFormat,
     /// Don't add `.optional()` to object properties
     pub ignore_undefined: bool,
 }
@@ -357,7 +368,10 @@ pub struct Parser(
 impl Default for Parser {
     fn default() -> Self {
         Self(ParserInner {
-            config: Default::default(),
+            config: Config {
+                date_format: DateFormat::CoerceDate,
+                ignore_undefined: false,
+            },
         })
     }
 }

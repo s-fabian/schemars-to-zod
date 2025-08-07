@@ -11,7 +11,7 @@ z.intersection(
   ]),
   z.object({
     a: z.int32(),
-    date: z.nullish(z.iso.date()),
+    date: z.nullish(z.coerce.date()),
     max: z.nullish(z.uint32()),
   }),
 );

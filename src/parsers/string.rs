@@ -1,6 +1,6 @@
 use schemars::schema::SchemaObject;
 
-use crate::{ParserInner, ParserResult};
+use crate::{DateFormat, ParserInner, ParserResult};
 
 impl ParserInner {
     /// Parse a string, or an enum
@@ -12,8 +12,11 @@ impl ParserInner {
         let mut res = if let Some(format) = object.format.as_ref().map(|s| s.as_str()) {
             let zod_function = match format {
                 "date-time" | "partial-date-time" | "date"
-                    if self.config.use_coerce_date =>
+                    if matches!(self.config.date_format, DateFormat::CoerceDate) =>
                     return Ok(String::from("z.coerce.date()")),
+                "date-time" | "partial-date-time" | "date"
+                    if matches!(self.config.date_format, DateFormat::JsDate) =>
+                    return Ok(String::from("z.date()")),
 
                 "email" => "z.email()",
                 "uri" => "z.url()",
