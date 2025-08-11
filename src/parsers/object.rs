@@ -38,7 +38,7 @@ impl ParserInner {
 
             let schema_parsed = if let Some(default) = default {
                 format!(
-                    "z.default({}, {})",
+                    "z._default({}, {})",
                     schema_parsed,
                     serde_json::to_string(default)?
                 )
@@ -93,7 +93,7 @@ impl ParserInner {
                 if let Some(object_parsed) = object_parsed {
                     format!("z.catchall({}, {})", object_parsed, additional_parsed)
                 } else {
-                    format!("z.record({})", additional_parsed)
+                    format!("z.record(z.string(), {})", additional_parsed)
                 }
             } else if let Some(object_parsed) = object_parsed {
                 object_parsed
