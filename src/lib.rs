@@ -301,12 +301,12 @@ pub mod pretty {
 /// How a date should be outputted
 #[derive(Clone, Copy, Debug, Default)]
 pub enum DateFormat {
-    /// z.date()
+    /// `z.date()`
     JsDate,
-    /// z.coerce.date()
+    /// `z.coerce.date()`
     #[default]
     CoerceDate,
-    /// z.iso.datetime()
+    /// `z.iso.datetime()`
     IsoStringDate,
 }
 
@@ -315,7 +315,7 @@ pub enum DateFormat {
 pub struct Config {
     /// How a date should be outputted
     pub date_format: DateFormat,
-    /// Don't add `.optional()` to object properties
+    /// Don't add `z.optional(<schema>)` to object properties
     pub ignore_undefined: bool,
 }
 
