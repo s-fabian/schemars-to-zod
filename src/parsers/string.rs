@@ -40,26 +40,32 @@ impl ParserInner {
         let options_default = Default::default();
         let options = object.string.as_ref().unwrap_or(&options_default);
 
-        if options
-            .min_length
-            .is_some_and(|min| options.max_length.is_some_and(|max| max == min))
+        let mut checks = Vec::new();
+
+        if let Some(min_length) = options.min_length
+            && let Some(max_length) = options.max_length
+            && min_length == max_length
         {
-            res.push_str(&format!(".length({})", options.min_length.unwrap()));
+            checks.push(format!("z.length({min_length})"));
         } else {
-            if let Some(val) = options.min_length {
-                res.push_str(&format!(".maxLength({})", val));
+            if let Some(min_items) = options.min_length {
+                checks.push(format!("z.minLength({min_items})"));
             }
 
-            if let Some(val) = options.max_length {
-                res.push_str(&format!(".minLength({})", val));
+            if let Some(max_items) = options.max_length {
+                checks.push(format!("z.maxLength({max_items})"));
             }
         }
 
         if let Some(pattern) = &options.pattern {
-            res.push_str(&format!(
-                ".regex(new RegExp({}))",
+            checks.push(format!(
+                "z.regex(new RegExp({}))",
                 serde_json::to_string(&pattern)?
             ));
+        }
+
+        if !checks.is_empty() {
+            res.push_str(&format!(".check({})", checks.join(", ")));
         }
 
         Ok(res)
