@@ -94,7 +94,6 @@ pub mod pretty {
 
     use std::path::Path;
 
-    pub use dprint_core::configuration::NewLineKind;
     pub use dprint_plugin_typescript::configuration::*;
     use dprint_plugin_typescript::format_text;
 
@@ -113,8 +112,12 @@ pub mod pretty {
             format!(".{extension}")
         };
 
-        Ok(format_text(Path::new(&path), text, config)?
-            .ok_or(String::from("Error: could not format js"))?)
+        let text = String::from(text);
+
+        Ok(
+            format_text(Path::new(&path), Some(extension), text, config)?
+                .ok_or(String::from("Error: could not format js"))?,
+        )
     }
 
     /// Get the default `PrettyConfig`
@@ -134,18 +137,19 @@ pub mod pretty {
             module_sort_import_declarations: SortOrder::Maintain,
             module_sort_export_declarations: SortOrder::Maintain,
             import_declaration_sort_named_imports: SortOrder::Maintain,
+            import_declaration_sort_type_only_imports: Default::default(),
             export_declaration_sort_named_exports: SortOrder::Maintain,
             import_declaration_force_single_line: false,
             export_declaration_force_single_line: false,
-            export_declaration_force_multi_line: false,
-            import_declaration_force_multi_line: false,
+            export_declaration_force_multi_line: ForceMultiLine::Never,
+            import_declaration_force_multi_line: ForceMultiLine::Never,
             ignore_node_comment_text: "".to_string(),
             ignore_file_comment_text: "".to_string(),
             // important
             indent_width: 2,
             line_width: 60,
             use_tabs: false,
-            new_line_kind: NewLineKind::Auto,
+            new_line_kind: dprint_core::configuration::NewLineKind::Auto,
             quote_style: QuoteStyle::AlwaysSingle,
             quote_props: QuoteProps::AsNeeded,
             semi_colons: SemiColons::Always,
@@ -285,15 +289,18 @@ pub mod pretty {
             arguments_space_around: false,
             array_expression_space_around: false,
             array_pattern_space_around: false,
+            catch_clause_space_around: false,
             do_while_statement_space_around: false,
             for_in_statement_space_around: false,
             for_of_statement_space_around: false,
             for_statement_space_around: false,
             if_statement_space_around: false,
             parameters_space_around: false,
+            paren_expression_space_around: false,
             switch_statement_space_around: false,
             tuple_type_space_around: false,
             while_statement_space_around: false,
+            export_declaration_sort_type_only_exports: Default::default(),
         }
     }
 }
