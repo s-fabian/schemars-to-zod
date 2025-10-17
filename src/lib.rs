@@ -95,7 +95,7 @@ pub mod pretty {
     use std::path::Path;
 
     pub use dprint_plugin_typescript::configuration::*;
-    use dprint_plugin_typescript::format_text;
+    use dprint_plugin_typescript::{FormatTextOptions, format_text};
 
     use super::PrettyConfig;
 
@@ -114,10 +114,15 @@ pub mod pretty {
 
         let text = String::from(text);
 
-        Ok(
-            format_text(Path::new(&path), Some(extension), text, config)?
-                .ok_or(String::from("Error: could not format js"))?,
-        )
+        let options = FormatTextOptions {
+            path: &Path::new(&path),
+            extension: Some(extension),
+            text,
+            config,
+            external_formatter: None,
+        };
+
+        Ok(format_text(options)?.ok_or(String::from("Error: could not format js"))?)
     }
 
     /// Get the default `PrettyConfig`
@@ -153,6 +158,7 @@ pub mod pretty {
             quote_style: QuoteStyle::AlwaysSingle,
             quote_props: QuoteProps::AsNeeded,
             semi_colons: SemiColons::Always,
+            file_indent_level: 0,
             arrow_function_use_parentheses: UseParentheses::PreferNone,
             binary_expression_line_per_expression: false,
             conditional_expression_line_per_expression: false,
