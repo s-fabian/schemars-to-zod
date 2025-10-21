@@ -80,7 +80,11 @@ impl ParserInner {
         )?;
 
         if variants.is_empty() {
-            return Ok(String::from("z.any()"));
+            return Ok(if self.config.prefer_unknown {
+                String::from("z.unknown()")
+            } else {
+                String::from("z.any()")
+            });
         }
         if let [only] = variants.as_slice() {
             return self.parse_schema(&only);

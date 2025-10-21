@@ -330,6 +330,8 @@ pub struct Config {
     pub date_format: DateFormat,
     /// Don't add `z.optional(<schema>)` to object properties
     pub ignore_undefined: bool,
+    /// Use `z.unknown()` instead of `z.any()`
+    pub prefer_unknown: bool,
 }
 
 /// The inside of the parser, which contains all
@@ -384,6 +386,7 @@ impl Default for Parser {
             config: Config {
                 date_format: DateFormat::CoerceDate,
                 ignore_undefined: false,
+                prefer_unknown: true,
             },
         })
     }
