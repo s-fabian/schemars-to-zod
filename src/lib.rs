@@ -321,6 +321,8 @@ pub enum DateFormat {
     CoerceDate,
     /// `z.iso.datetime()`
     IsoStringDate,
+    /// `z.date().check(z.refine(date => date.toJSON()))`
+    DateToJson,
 }
 
 /// Configuration for the parser

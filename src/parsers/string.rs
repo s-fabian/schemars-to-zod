@@ -17,6 +17,11 @@ impl ParserInner {
                 "date-time" | "partial-date-time" | "date"
                     if matches!(self.config.date_format, DateFormat::JsDate) =>
                     return Ok(String::from("z.date()")),
+                "date-time" | "partial-date-time" | "date"
+                    if matches!(self.config.date_format, DateFormat::DateToJson) =>
+                    return Ok(String::from(
+                        "z.date().check(z.refine(date => date.toJSON()))",
+                    )),
 
                 "email" => "z.email()",
                 "uri" => "z.url()",
